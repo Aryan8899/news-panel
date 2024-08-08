@@ -9,7 +9,9 @@ const UserManagementPage = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get("http://localhost:9000/articles");
+        const response = await axios.get(
+          "http://localhost:9000/articles"
+        );
         setArticles(response.data);
       } catch (err) {
         setError("Error fetching articles");
@@ -25,7 +27,9 @@ const UserManagementPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this article?")) {
       try {
-        await axios.delete(`http://localhost:9000/articles/${id}`);
+        await axios.delete(
+          `http://localhost:9000/articles/${id}`
+        );
         setArticles(articles.filter((article) => article._id !== id));
         alert("Article deleted successfully");
       } catch (err) {
@@ -55,6 +59,22 @@ const UserManagementPage = () => {
         {articles.map((article) => (
           <li key={article._id} className="border-b py-2">
             <h3 className="font-semibold">{article.title}</h3>
+
+            <img
+              src={
+                article.image
+                  ? `http://localhost:9000${article.image}`
+                  : "placeholder-image-url"
+              }
+              alt={article.title}
+              className="w-full h-full ml-4 mr-4 rounded-lg object-cover"
+              style={{ maxHeight: "500px", maxWidth: "666px" }} // Adjust max height as needed
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "placeholder-image-url";
+              }}
+            />
+
             <p>{getExcerpt(article.content)}</p>
             <p className="text-gray-500">
               {new Date(article.date).toLocaleDateString()}

@@ -19,7 +19,7 @@ const postingImage = async (req, res) => {
     const savedImage = await image.save();
 
     // Set the imageUrl based on your server URL and the image ID
-    savedImage.imageUrl = `http://localhost:9000/api/images/${savedImage._id}`;
+    savedImage.imageUrl = `https://database1.api.webthreeworld.com/api/images/${savedImage._id}`;
     //this is for getting the image from the database
 
     // Save the updated Image model
@@ -35,7 +35,7 @@ const postingImage = async (req, res) => {
 
 
 // @Getting Specific Image using GET
-// http://localhost:9000/api/images/:id
+// https://database1.api.webthreeworld.com/api/images/:id
 const singleImage = async (req, res) => {
   try {
     const image = await Image.findById(req.params.id); //req -> local:Url 

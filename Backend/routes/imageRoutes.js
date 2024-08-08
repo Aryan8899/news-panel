@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../../src/Middleware/multerStorage');
+const upload = require('../Middleware/multerStorage');
 const { News } = require('../models/News');
 
 // Route to handle adding a news article

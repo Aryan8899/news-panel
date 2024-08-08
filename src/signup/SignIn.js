@@ -24,6 +24,7 @@ const SignIn = () => {
         navigate("/admin"); // Redirect to dashboard
       }
     } catch (err) {
+      console.error('Sign-in error:', err);
       setError(err.response?.data?.message || "Error signing in");
     }
   };

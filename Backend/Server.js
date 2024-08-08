@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-const { News, User } = require("./models/News"); // Your News model
+const { User, News } = require("./models/News"); // Ensure the correct path and model names
 const bcrypt = require("bcrypt");
 const connectToDatabase = require("./config/connectToDatabase");
 const imageRouter = require("./routes/imageRoutes");
@@ -20,12 +20,15 @@ if (!fs.existsSync(uploadDir)) {
 
 // Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 9000;
+const PORT = 9000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from the uploads directory
+app.use("/uploads", express.static(uploadDir));
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
@@ -40,11 +43,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Default route
-app.get('/', (req, res) => {
-  res.send('Hello MEDIUM');
+app.get("/", (req, res) => {
+  res.send("Hello MEDIUM");
 });
 
-app.use('/api/images', imageRouter);
+app.use("/api/images", imageRouter);
 
 // Route to handle user signup
 app.post("/signup", async (req, res) => {
@@ -62,36 +65,47 @@ app.post("/signup", async (req, res) => {
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     console.error("Error signing up:", error);
+    4;
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// Route to handle user sign-in
 app.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    console.log("Sign-in attempt with email:", email);
+
     const user = await User.findOne({ email });
     if (!user) {
+      console.log("User not found with email:", email);
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    console.log("User found:", user);
+
+    // Compare the entered password with the hashed password in the database
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password comparison result:", isMatch);
     if (!isMatch) {
+      console.log("Password does not match for user with email:", email);
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    console.log("Sign-in successful for user with email:", email);
     res.json({ message: "Sign-in successful", user: { email: user.email } });
   } catch (error) {
-    console.error(error);
+    console.error("Error during sign-in:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+
+
 // Route to handle adding a news article
 app.post("/add", upload.single("image"), async (req, res) => {
   const { title, content, date } = req.body;
-  const image = req.file ? req.file.path : null;
+  const image = req.file ? `/uploads/${req.file.filename}` : null;
 
   const newArticle = new News({ title, image, content, date });
 
